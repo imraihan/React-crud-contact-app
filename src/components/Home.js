@@ -11,10 +11,9 @@ const Home = () => {
   const [contacts, setContacts] = useState([]);
 
   const [search, setSearch] = useState('');
-  console.log(search);
   
   const navigate = useNavigate();
-
+// fetch data from local storage
   useEffect(() => {
     const contacts = localStorage.getItem('contacts')!=null?JSON.parse(localStorage.getItem('contacts')):[];
     setContacts((contacts))
@@ -23,13 +22,13 @@ const Home = () => {
   useEffect(() => {
     const contacts = localStorage.getItem('contacts') && localStorage.getItem('contacts').length > 0 ? JSON.parse(localStorage.getItem('contacts')) : []
     const filterOut = contacts.filter((contact) => contact.contact.id === viewId);
-    filterOut.map((key)=> {
+    filterOut.forEach((key)=> {
         setViewData(key.contact);
     });
   }, [viewId])
   
   const handleDelete=(id)=> {
-    console.log(typeof(id));
+    // console.log(typeof(id));
     const filterOut = contacts.filter((contact) => contact.contact.id !== id);
     localStorage.setItem("contacts", JSON.stringify(filterOut));
     setContacts(filterOut);
@@ -44,6 +43,7 @@ const Home = () => {
     setShow(true);
   }
   const handleClose = () => setShow(false);
+
   return (
     <div className='container'>
       <div>
@@ -69,11 +69,12 @@ const Home = () => {
             </thead>
             <tbody>
             {
-              contacts.filter((c)=>{
-                return (search.toLowerCase() === '') ? c : 
-                c.contact.name.toLowerCase().includes(search);
+              contacts.filter((contact)=>{
+                const {name } = contact.contact;
+                return (search.toLowerCase() === '') ? contact : 
+                name.toLowerCase().includes(search);
                     }
-                      ).map(function(contact) {
+                      ).map((contact)=> {
                 const {id,name,phone, company } = contact.contact;
                     return (
                       
@@ -103,6 +104,7 @@ const Home = () => {
       }
     </p>
     
+    {/* Modal for view contact details  */}
     {
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
