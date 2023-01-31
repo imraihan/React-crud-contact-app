@@ -15,7 +15,7 @@ const AddContact = () => {
     const handleContactSubmit = (e) => {
         e.preventDefault();
         const createDate = dateFormat();
-        let contact = {id : uuidv4(),name,phone,company,createDate}
+        let contact = {id : uuidv4(),name,phone,company,address,createDate}
         const contacts = localStorage.getItem('contacts') && localStorage.getItem('contacts').length > 0 ? JSON.parse(localStorage.getItem('contacts')) : []
         localStorage.setItem('contacts', JSON.stringify([...contacts, {contact}]))
         navigate('/');
