@@ -8,9 +8,13 @@ const Home = () => {
   const [viewId, setViewId] = useState();
   const [viewData, setViewData] = useState([]);
   const [show, setShow] = useState(false);
+  const [deleteShow, setDeleteShow] = useState(false);
   const [contacts, setContacts] = useState([]);
+  const [deleteId, setDeleteId] = useState('');
 
   const [search, setSearch] = useState('');
+
+  let searchCount = 0;
   
   const navigate = useNavigate();
 // fetch data from local storage
@@ -27,11 +31,17 @@ const Home = () => {
     });
   }, [viewId])
   
+  const handleClickDelete =(id) => {
+    setDeleteId(id);
+    console.log(id)
+    setDeleteShow(true);
+  }
+
   const handleDelete=(id)=> {
-    // console.log(typeof(id));
-    const filterOut = contacts.filter((contact) => contact.contact.id !== id);
+    const filterOut = contacts.filter((contact) => contact.contact.id !== deleteId);
     localStorage.setItem("contacts", JSON.stringify(filterOut));
     setContacts(filterOut);
+    setDeleteShow(false);
   }
 
   const handleEdit =(id)=> {
@@ -43,6 +53,7 @@ const Home = () => {
     setShow(true);
   }
   const handleClose = () => setShow(false);
+  const handleCloseDelete = () => setDeleteShow(false);
 
   return (
     <div className='container'>
@@ -71,11 +82,17 @@ const Home = () => {
             {
               contacts.filter((contact)=>{
                 const {name } = contact.contact;
+
+                searchCount = (contacts.filter((contact)=>{
+                  const {name } = contact.contact;
+                  return name.toLowerCase().includes(search.toLowerCase())}).length);
+
                 return (search.toLowerCase() === '') ? contact : 
-                name.toLowerCase().includes(search);
+                name.toLowerCase().includes(search.toLowerCase());
+
                     }
                       ).map((contact)=> {
-                const {id,name,phone, company } = contact.contact;
+                        const {id,name,phone, company } = contact.contact;
                     return (
                       
                       <tr key={id}>
@@ -83,7 +100,7 @@ const Home = () => {
                         <td>{phone}</td>
                         <td>{company}</td>
                         <td>
-                        <button type='button' className='btn btn-primary' onClick={()=>{handleDelete(id)}}>Delete</button>
+                        <button type='button' className='btn btn-primary' onClick={()=>{handleClickDelete(id)}}>Delete</button>
                         <button type='button' className='btn btn-danger' onClick={()=> {handleEdit(id)}}>Edit</button>
                         <button type='button' className='btn btn-info' onClick={()=> {handleView(id)}}>View</button>
                         </td>
@@ -95,12 +112,15 @@ const Home = () => {
             </tbody>
       </table> 
         :  
-        `There is no contact`
+        ''
       }
     <p>
-      {(search.toLowerCase() === '') ? 
-      (contacts.length>0 ? `${contacts.length} contact is available` :'')
-       : ''
+      {
+      (search.toLowerCase() === '') ? 
+      (contacts.length>0 ? `${contacts.length} contact available` :'no contact available')
+       :
+       (
+        searchCount > 0 ? searchCount + ' contact found' : 'no contact found')
       }
     </p>
     
@@ -138,7 +158,27 @@ const Home = () => {
           </Button>
         </Modal.Footer>
       </Modal> 
-      }
+      }  
+
+
+{/* Modal for delete popup */}
+      {<Modal show={deleteShow} onHide={handleCloseDelete}>
+        <Modal.Header closeButton>
+          <Modal.Title>Contact</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure want to delete this?
+        </Modal.Body>
+        <Modal.Footer>
+        <Button variant="secondary" onClick={handleDelete}>
+            Ok
+          </Button>
+          <Button variant="secondary" onClick={handleCloseDelete}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>}
+
     </div>
   )
 }
